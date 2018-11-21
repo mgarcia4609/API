@@ -44,12 +44,52 @@ namespace TodoApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(TodoItem item)
+        public IActionResult Create([FromBody]TodoItem item)
         {
+            if (item == null)
+            {
+                return BadRequest();
+            }
+
             _context.TodoItems.Add(item);
             _context.SaveChanges();
 
             return CreatedAtRoute("GetTodo", new { id = item.Id }, item);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult Update(long id, TodoItem item)
+        {
+            var todo = _context.TodoItems.Find(id);
+
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            todo.IsComplete = item.IsComplete;
+            todo.Name = item.Name;
+
+            _context.TodoItems.Update(todo);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(long id)
+        {
+            var todo = _context.TodoItems.Find(id);
+
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            _context.TodoItems.Remove(todo);
+            _context.SaveChanges();
+
+            return NoContent();
         }
     }
 }
